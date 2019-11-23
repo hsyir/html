@@ -17,7 +17,7 @@
                 "Hsy\\Html\\HsyHtmlServiceProvider"
             ],
             "aliases": {
-                "CntManager": "Hsy\\Html\\Facade"
+                "Html": "Hsy\\Html\\Facade"
             }
         }
     },
