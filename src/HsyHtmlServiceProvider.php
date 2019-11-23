@@ -38,5 +38,11 @@ class HsyHtmlServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/config/html.php' => config_path('html.php'),
         ], 'config');
 
+
+        $this->publishes([
+            __DIR__.'/../resources/views' => resource_path('views/vendor/html'),
+        ], 'views');
+
+
     }
 }
