@@ -1,0 +1,29 @@
+{
+    "name": "hosseinyaghmaee/html",
+    "authors": [
+        {
+            "name": "Hossein",
+            "email": "hosseinyaghmaee@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hsy\\Html\\HsyHtmlServiceProvider"
+            ],
+            "aliases": {
+                "CntManager": "Hsy\\Html\\Facade"
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Hsy\\Html\\": "src/"
+        }
+    }
+}
