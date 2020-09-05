@@ -4,7 +4,7 @@ namespace Hsy\Html;
 
 use Illuminate\Support\ServiceProvider;
 
-class HsyHtmlServiceProvider extends ServiceProvider
+class HtmlServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

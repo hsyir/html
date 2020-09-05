@@ -14,10 +14,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Hsy\\Html\\HsyHtmlServiceProvider"
+                "Hsy\\Html\\HtmlServiceProvider"
             ],
             "aliases": {
-                "Html": "Hsy\\Html\\Facade"
+                "Html": "Hsy\\Html\\Facades\\Html"
             }
         }
     },
