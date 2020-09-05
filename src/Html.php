@@ -2,86 +2,39 @@
 
 namespace Hsy\Html;
 
-use Mockery\Exception;
+use Hsy\Html\Exceptions\ComponentNotFound;
 
-class Html
+class
+
+Html
 {
-
-    private $htmlEntities = [];
-
-    private $arguments = [];
-    private $parameters = [];
-
-    private $renderable = true;
-
-    private $htmlEntity = "text";
+    private $component_items = [];
+    private $variables = [];
+    private $component_parameters = [];
+    private $must_render = true;
+    private $active_component = null;
 
     public function __construct()
     {
-        $this->arguments = config('html.arguments');
-        $this->argumentsAsArray = config('html.argumentsAsArray');
-        $this->htmlEntities = config('html.htmlEntities');
+        $this->variables = config('html.variables');
+        $this->component_items = config('html.components');
     }
-
-    public function when($renderable)
-    {
-        $this->renderable = $renderable ? true : false;
-        return $this;
-    }
-
-    private function getViewFileName()
-    {
-        $path = 'html::';
-        $viewFileName = $path . "_" . $this->htmlEntity;
-        if (view()->exists($viewFileName))
-            return $viewFileName;
-
-        throw new \Exception('View File Not Found: ' . "$viewFileName");
-    }
-
-    private function resetParameters()
-    {
-        $this->renderable = true;
-        $this->parameters = [];
-    }
-
-
-    public function __toString()
-    {
-        if (!$this->renderable) {
-            $this->resetParameters();
-            return "";
-        }
-        $html = "";
-
-        try {
-            $view = $this->getViewFileName();
-            $html = view($view, $this->parameters)->render();
-        } catch (\Exception $exception) {
-            dump($this->parameters, $view);
-            dd($exception->getMessage());
-        }
-
-        $this->resetParameters();
-
-        echo $html;
-        return "";
-    }
-
 
     public function __call($methodName, $args)
     {
-        $firstArg = isset($args[0]) ? $args[0] : null;
+        $firstArg = $args[0] ?? null;
+
+        if (!$this->active_component) {
+            $tryResult = $this->trySetActiveComponent($methodName, $firstArg);
+            if ($tryResult === true)
+                return $this;
+            throw new ComponentNotFound($tryResult);
+        }
 
         try {
-            if ($this->trySetEntityType($methodName, $firstArg))
+            if ($this->trySetVariable($methodName, $firstArg))
                 return $this;
-            if ($this->trySetParameter($methodName, $firstArg))
-                return $this;
-
             $this->tryAddAsAttribute($methodName, $firstArg);
-
-
         } catch (\Exception $e) {
             die($e->getMessage());
         }
@@ -89,31 +42,89 @@ class Html
         return $this;
     }
 
-    private function trySetEntityType($htmlEntity, $nameAttribute = null)
+    public function when($must_render)
     {
-        //try to set field type
-        if (in_array($htmlEntity, $this->htmlEntities)) {
-            $this->htmlEntity = $htmlEntity;
-            if ($nameAttribute)
-                $this->parameters['name'] = $nameAttribute;
-            return true;
-        }
-        return false;
+        $this->must_render = $must_render;
+        return $this;
     }
 
-    private function trySetParameter($parameter, $value)
+    private function getComponentFullPath($component)
     {
-        if (in_array($parameter, $this->arguments)) {
-            $this->parameters[$parameter] = $value;
-            return true;
+        return config("html.views_path") . $component;
+    }
+
+    private function getActiveComponentFullPath()
+    {
+        $fullPath = $this->getComponentFullPath($this->active_component);
+        if (view()->exists($fullPath))
+            return $fullPath;
+
+        throw new \Exception("Component file not found: '$fullPath'");
+    }
+
+    private function resetComponentParameters()
+    {
+        $this->must_render = true;
+        $this->active_component = null;
+        $this->component_parameters = [];
+    }
+
+    private function trySetActiveComponent($componentName, $nameAttribute = null)
+    {
+        if (!in_array($componentName, $this->component_items))
+            return "Component '$componentName' not defined";
+
+        $this->active_component = $componentName;
+        try {
+            $this->getActiveComponentFullPath();
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
-        return false;
+
+        if ($nameAttribute)
+            $this->component_parameters['name'] = $nameAttribute;
+
+        return true;
+    }
+
+    private function trySetVariable($parameter, $value)
+    {
+        if (!in_array($parameter, $this->variables))
+            return false;
+
+        $this->component_parameters[$parameter] = $value;
+        return true;
     }
 
     private function tryAddAsAttribute($attribute, $value)
     {
+        $this->component_parameters['attributes'][$attribute] = $value;
+    }
 
-        $this->parameters['attributes'][$attribute] = $value;
+    public function __toString()
+    {
+        if (!$this->must_render) {
+            $this->resetComponentParameters();
+            return "";
+        }
+
+        try {
+            $componentViewFilePath = $this->getActiveComponentFullPath();
+            $html = view($componentViewFilePath, $this->component_parameters)->render();
+        } catch (\Exception $exception) {
+            echo view("html::error.errorMessage",
+                [
+                    "component" => $this->active_component,
+                    "message" => $exception->getMessage()
+                ]
+            );
+            die;
+        }
+
+        $this->resetComponentParameters();
+
+        echo $html;
+        return "";
     }
 
 }

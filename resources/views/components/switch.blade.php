@@ -1,8 +1,7 @@
-
 <div class="form-group ">
     <!-- Rounded switch -->
     <label class="switch">
-        <input type="checkbox" {{ isset($value) and $value==true ? "checked" : ""    }}
+        <input type="checkbox" {{ (isset($checked) and $checked==true) ? "checked" : ""    }}
         id="{{ $name }}" name="{{ $name }}">
         <span class="slider round"></span>
     </label>

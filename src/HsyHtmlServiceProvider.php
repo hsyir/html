@@ -14,14 +14,12 @@ class HsyHtmlServiceProvider extends ServiceProvider
     public function register()
     {
 
-        \App::bind('Html', function()
+       /* \App::bind('Html', function()
         {
             return new Html;
-        });
+        });*/
 
-
-
-        $this->mergeConfigFrom(__DIR__ . '/../resources/config/html.php', 'html');
+        $this->mergeConfigFrom(__DIR__ . '/../config/html.php', 'html');
 
     }
 
@@ -35,14 +33,11 @@ class HsyHtmlServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'html');
 
         $this->publishes([
-            __DIR__ . '/../resources/config/html.php' => config_path('html.php'),
+            __DIR__ . '/../config/html.php' => config_path('html.php'),
         ], 'config');
-
 
         $this->publishes([
             __DIR__.'/../resources/views' => resource_path('views/vendor/html'),
         ], 'views');
-
-
     }
 }
