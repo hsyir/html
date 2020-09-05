@@ -1,5 +1,6 @@
 {
     "name": "hsyir/html",
+    "description": "Laravel Html Component Factory",
     "authors": [
         {
             "name": "Hossein",
