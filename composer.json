@@ -26,5 +26,8 @@
         "psr-4": {
             "Hsy\\Html\\": "src/"
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0@dev"
     }
 }
