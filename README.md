@@ -1,6 +1,6 @@
 # Html Maker
 
-This is a laravel package for create html tags in simple way.
+This is a laravel package for create html components in simple way.
 
 ## Installation
 
